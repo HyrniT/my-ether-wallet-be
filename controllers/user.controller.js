@@ -1,4 +1,4 @@
-const User = require('../models/user.model');
+const { User } = require('../models');
 
 // CRUD Controllers
 
@@ -26,11 +26,12 @@ exports.getUser = (req, res, next) => {
 
 //create user
 exports.createUser = (req, res, next) => {
-  const name = req.body.name;
-  const email = req.body.email;
+  const publicKey = req.body.publicKey;
+  const addressWallet = req.body.addressWallet;
+
   User.create({
-    name: name,
-    email: email,
+    publicKey: publicKey,
+    addressWallet: addressWallet,
   })
     .then(result => {
       console.log('Created User');

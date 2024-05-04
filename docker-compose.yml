@@ -30,5 +30,18 @@ services:
     volumes:
       - ether-data:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4-container
+    restart: always
+    ports:
+      - $PGADMIN_LOCAL_PORT:$PGADMIN_DOCKER_PORT
+    environment:
+      PGADMIN_DEFAULT_EMAIL: $PGADMIN_EMAIL
+      PGADMIN_DEFAULT_PASSWORD: $PGADMIN_PASSWORD
+      PGADMIN_LISTEN_PORT: $PGADMIN_DOCKER_PORT
+    depends_on:
+      - postgresdb
+
 volumes:
   ether-data: {}

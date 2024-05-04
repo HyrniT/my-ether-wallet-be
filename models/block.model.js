@@ -1,8 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
   const { DataTypes } = Sequelize;
 
-  const User = sequelize.define(
-    'user',
+  const Block = sequelize.define(
+    'block',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -10,23 +10,27 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         primaryKey: true,
       },
-      publicKey: {
-        type: DataTypes.CHAR(130),
+      hash: {
+        type: DataTypes.CHAR(64),
         allowNull: false,
         unique: true,
       },
-      addressWallet: {
-        type: DataTypes.CHAR(42),
+      previousHash: {
+        type: DataTypes.CHAR(64),
         allowNull: false,
         unique: true,
       },
-      balance: {
-        type: DataTypes.REAL, // Postgres only
-        defaultValue: 0,
+      nonce: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
-      createdAt: {
+      status: {
+        type: DataTypes.ENUM('Finalized', 'Unfinalized'),
+        defaultValue: 'Finalized',
+      },
+      timestamp: {
         type: DataTypes.DATE, // TIMESTAMP WITH TIME ZONE for postgres
-        defaultValue: Sequelize.NOW,
+        defaultValue: DataTypes.NOW,
       },
     },
     {
@@ -35,5 +39,5 @@ module.exports = (sequelize, Sequelize) => {
     },
   );
 
-  return User;
+  return Block;
 };

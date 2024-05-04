@@ -5,8 +5,7 @@ const cors = require('cors');
 
 const { PORT, CLIENT_PORT } = require('./configs/app.config');
 const routes = require('./routes');
-const db = require('./services/db.service');
-const User = require('./models/user.model');
+const db = require('./models');
 const app = express();
 
 app.use(
@@ -38,7 +37,8 @@ app.get('/', (req, res) => {
   res.send('Hello World');
 });
 
-db.sync({ alter: true })
+db.sequelize
+  .sync({ alter: true })
   .then(() => {
     console.log('Database connected');
     app
