@@ -6,6 +6,10 @@ const cors = require('cors');
 const { PORT, CLIENT_PORT } = require('./configs/app.config');
 const routes = require('./routes');
 const db = require('./models');
+
+const responseHandler = require('./middlewares/responseHandler');
+const { errorResponse, successResponse } = require('./utils/formatResponse');
+
 const app = express();
 
 app.use(
@@ -17,24 +21,24 @@ app.use(
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(cookieParser());
-
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   next();
 });
 
-// app.use((error, req, res, next) => {
-//   console.log(error);
-//   const status = error.statusCode || 500;
-//   const message = error.message;
-//   res.status(status).json({ message: message });
-// });
+app.use(responseHandler);
 
 app.use('/api', routes);
 
 app.get('/', (req, res) => {
-  res.send('Hello World');
+  const responseData = successResponse({ message: 'Hello World!' }); // for testing
+  res.sendResponse(responseData);
+});
+
+app.use((req, res, next) => {
+  const responseData = errorResponse('Not found', 404);
+  res.sendResponse(responseData);
 });
 
 db.sequelize

@@ -1,8 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
   const { DataTypes } = Sequelize;
 
-  const User = sequelize.define(
-    'user',
+  const Wallet = sequelize.define(
+    'wallet',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -15,7 +15,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         unique: true,
       },
-      addressWallet: {
+      address: {
         type: DataTypes.CHAR(42),
         allowNull: false,
         unique: true,
@@ -35,5 +35,5 @@ module.exports = (sequelize, Sequelize) => {
     },
   );
 
-  return User;
+  return Wallet;
 };
