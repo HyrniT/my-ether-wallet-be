@@ -11,7 +11,7 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true,
       },
       hash: {
-        type: DataTypes.CHAR(64),
+        type: DataTypes.CHAR(66),
         allowNull: false,
         unique: true,
       },

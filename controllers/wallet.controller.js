@@ -51,7 +51,8 @@ exports.sendTransaction = async (req, res) => {
         const toAddress = receiver.address;
         const amount = req.body.amount;
         const transaction = await Transaction.create({
-          hash: hash(fromAddress, toAddress, amount, new Date().getTime()),
+          hash:
+            '0x' + hash(fromAddress, toAddress, amount, new Date().getTime()),
           fromAddress: fromAddress,
           toAddress: toAddress,
           amount: amount,
