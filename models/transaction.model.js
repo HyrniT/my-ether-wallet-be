@@ -28,7 +28,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       signature: {
         type: DataTypes.STRING,
-        allowNull: false,
+        // allowNull: false,
         unique: true,
       },
       status: {
