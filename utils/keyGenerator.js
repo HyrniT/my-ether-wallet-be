@@ -29,4 +29,5 @@ module.exports = {
   publicKey,
   privateKey,
   address,
+  getAddress,
 };

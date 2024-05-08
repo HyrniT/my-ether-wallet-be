@@ -50,19 +50,25 @@ exports.sendTransaction = async (req, res) => {
         const fromAddress = sender.address;
         const toAddress = receiver.address;
         const amount = req.body.amount;
-        const transaction = await Transaction.create({
-          hash:
-            '0x' + hash(fromAddress, toAddress, amount, new Date().getTime()),
+        const transaction = await Transaction.build({
           fromAddress: fromAddress,
           toAddress: toAddress,
           amount: amount,
-          timestamp: new Date().getTime(),
-          walletId: sender.id,
         });
-        const signature = signTransaction(transaction, privateKey);
-        await transaction.update({ signature: signature });
-        await sender.update({ balance: sender.balance - req.body.amount });
-        await receiver.update({ balance: receiver.balance + req.body.amount });
+        transaction.walletId = sender.id;
+        transaction.timestamp = new Date().getTime();
+        transaction.hash = '0x' + transaction.calculateHash();
+        transaction.signTransaction(privateKey);
+        transaction.save().then(async () => {
+          try {
+            await sender.update({ balance: sender.balance - req.body.amount });
+            await receiver.update({
+              balance: receiver.balance + req.body.amount,
+            });
+          } catch (error) {
+            console.error(error);
+          }
+        });
         res.sendResponse(successResponse(transaction, 201));
       } else {
         res.sendResponse(errorResponse('Insufficient balance', 401));
