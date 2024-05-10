@@ -58,9 +58,9 @@ module.exports = (sequelize, Sequelize) => {
   Transaction.prototype.signTransaction = function (privateKey) {
     const signingKey = ec.keyFromPrivate(privateKey);
 
-    if (getAddress(signingKey.getPublic('hex')) !== this.fromAddress) {
-      throw new Error('You cannot sign transactions for other wallets!');
-    }
+    // if (getAddress(signingKey.getPublic('hex')) !== this.fromAddress) {
+    //   throw new Error('You cannot sign transactions for other wallets!');
+    // }
 
     const hashTransaction = this.calculateHash();
     const sig = signingKey.sign(hashTransaction, 'base64');

@@ -4,6 +4,7 @@ const { sequelize, Sequelize } = db;
 db.Wallet = require('./wallet.model')(sequelize, Sequelize);
 db.Block = require('./block.model')(sequelize, Sequelize);
 db.Transaction = require('./transaction.model')(sequelize, Sequelize);
+// db.Blockchain = require('./blockchain.model')(sequelize, Sequelize);
 
 // Associations
 // Transaction - Block

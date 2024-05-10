@@ -1,12 +1,20 @@
-const { Wallet, Transaction } = require('../models');
+const { Wallet } = require('../models');
 const { successResponse, errorResponse } = require('../utils/formatResponse');
-const { publicKey, privateKey, address } = require('../utils/keyGenerator');
-const hash = require('../utils/hash');
-const signTransaction = require('../utils/signTransaction');
+const {
+  generateKeyPair,
+  getPublicKey,
+  getPrivateKey,
+  getAddress,
+} = require('../utils/keyGenerator');
 
 // [GET] /wallet/create: generate a new wallet
 exports.createWallet = async (req, res) => {
   try {
+    const keyPair = generateKeyPair();
+    const publicKey = getPublicKey(keyPair);
+    const privateKey = getPrivateKey(keyPair);
+    const address = getAddress(publicKey);
+
     await Wallet.create({
       publicKey: publicKey,
       address: address,
@@ -14,7 +22,7 @@ exports.createWallet = async (req, res) => {
     res.sendResponse(successResponse({ privateKey: privateKey }, 201));
   } catch (error) {
     console.error(error.message);
-    res.sendResponse(errorResponse());
+    res.sendResponse(errorResponse(error.message));
   }
 };
 
@@ -31,54 +39,7 @@ exports.getWallet = async (req, res) => {
     }
   } catch (error) {
     console.error(error.message);
-    res.sendResponse(errorResponse());
-  }
-};
-
-// [POST] /wallet/send: send transaction
-exports.sendTransaction = async (req, res) => {
-  try {
-    const sender = await Wallet.findOne({
-      where: { address: req.body.sender },
-    });
-    const receiver = await Wallet.findOne({
-      where: { address: req.body.receiver },
-    });
-    if (sender && receiver) {
-      if (sender.balance >= req.body.amount) {
-        const privateKey = req.body.privateKey;
-        const fromAddress = sender.address;
-        const toAddress = receiver.address;
-        const amount = req.body.amount;
-        const transaction = await Transaction.build({
-          fromAddress: fromAddress,
-          toAddress: toAddress,
-          amount: amount,
-        });
-        transaction.walletId = sender.id;
-        transaction.timestamp = new Date().getTime();
-        transaction.hash = '0x' + transaction.calculateHash();
-        transaction.signTransaction(privateKey);
-        transaction.save().then(async () => {
-          try {
-            await sender.update({ balance: sender.balance - req.body.amount });
-            await receiver.update({
-              balance: receiver.balance + req.body.amount,
-            });
-          } catch (error) {
-            console.error(error);
-          }
-        });
-        res.sendResponse(successResponse(transaction, 201));
-      } else {
-        res.sendResponse(errorResponse('Insufficient balance', 401));
-      }
-    } else {
-      res.sendResponse(errorResponse('Wallet not found', 401));
-    }
-  } catch (error) {
-    console.error(error);
-    res.sendResponse(errorResponse());
+    res.sendResponse(errorResponse(error.message));
   }
 };
 
@@ -96,6 +57,26 @@ exports.updateBalance = async (req, res) => {
     }
   } catch (error) {
     console.error(error.message);
-    res.sendResponse(errorResponse());
+    res.sendResponse(errorResponse(error.message));
   }
 };
+
+function getBalance(address) {
+  let balance = 0;
+
+  const successTransactions = Transaction.findAll({
+    where: { status: 'Success' },
+  });
+
+  successTransactions.forEach(tx => {
+    if (tx.fromAddress === address) {
+      balance -= tx.amount;
+    }
+
+    if (tx.toAddress === address) {
+      balance += tx.amount;
+    }
+  });
+
+  return balance;
+}

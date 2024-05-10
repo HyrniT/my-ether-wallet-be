@@ -20,14 +20,9 @@ function getAddress(publicKey) {
   return address;
 }
 
-const keyPair = generateKeyPair();
-const publicKey = getPublicKey(keyPair);
-const privateKey = getPrivateKey(keyPair);
-const address = getAddress(publicKey);
-
 module.exports = {
-  publicKey,
-  privateKey,
-  address,
+  generateKeyPair,
+  getPublicKey,
+  getPrivateKey,
   getAddress,
 };

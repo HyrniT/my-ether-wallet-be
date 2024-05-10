@@ -10,6 +10,8 @@ const db = require('./models');
 const responseHandler = require('./middlewares/responseHandler');
 const { errorResponse, successResponse } = require('./utils/formatResponse');
 
+const createGenesisBlock = require('./utils/createGenesisBlock');
+
 const app = express();
 
 app.use(
@@ -48,6 +50,9 @@ db.sequelize
   .sync({ alter: true })
   .then(() => {
     console.log('Database connected');
+
+    createGenesisBlock();
+
     app
       .listen(PORT, () => {
         console.log(`Server listening on port ${PORT}`);
