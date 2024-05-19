@@ -50,6 +50,8 @@ async function mineBlock(address, privateKey) {
     block.hash = hash;
     block.nonce = nonce;
     block.status = 'Finalized';
+    // block.addTransaction(rewardTx);
+    block.pendingTransactions = pendingTxs;
     await block.save();
 
     for (const tx of pendingTxs) {
@@ -68,7 +70,6 @@ async function mineBlock(address, privateKey) {
       }
 
       if (!sender) {
-        console.log('Reward transaction', tx.amount);
         receiver.balance += tx.amount;
         await receiver.save();
       } else {
@@ -78,12 +79,13 @@ async function mineBlock(address, privateKey) {
         await sender.save();
         await receiver.save();
       }
-
-      console.log('Transaction', tx.hash, 'is mined');
       await tx.save();
     }
 
-    return wallet;
+    // Update wallet balance
+    const newWallet = await Wallet.findOne({ where: { address } });
+
+    return newWallet;
   } catch (error) {
     console.error(error);
     throw error;

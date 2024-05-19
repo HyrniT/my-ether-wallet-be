@@ -40,7 +40,7 @@ module.exports = (sequelize, Sequelize) => {
       miningReward: {
         type: DataTypes.REAL,
         allowNull: false,
-        defaultValue: 0.5,
+        defaultValue: 0.1,
       },
       status: {
         type: DataTypes.ENUM('Finalized', 'Unfinalized'),
