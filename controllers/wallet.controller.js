@@ -1,4 +1,4 @@
-const { Wallet } = require('../models');
+const { Wallet, Transaction } = require('../models');
 const { successResponse, errorResponse } = require('../utils/formatResponse');
 const {
   generateKeyPair,
@@ -32,6 +32,7 @@ exports.getWallet = async (req, res) => {
     const wallet = await Wallet.findOne({
       where: { publicKey: req.params.publicKey },
     });
+
     if (wallet) {
       res.sendResponse(successResponse(wallet));
     } else {
@@ -60,23 +61,3 @@ exports.updateBalance = async (req, res) => {
     res.sendResponse(errorResponse(error.message));
   }
 };
-
-function getBalance(address) {
-  let balance = 0;
-
-  const successTransactions = Transaction.findAll({
-    where: { status: 'Success' },
-  });
-
-  successTransactions.forEach(tx => {
-    if (tx.fromAddress === address) {
-      balance -= tx.amount;
-    }
-
-    if (tx.toAddress === address) {
-      balance += tx.amount;
-    }
-  });
-
-  return balance;
-}
